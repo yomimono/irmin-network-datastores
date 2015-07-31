@@ -5,3 +5,4 @@ setup.data
 setup.log
 test_ops.native
 test_table.native
+*.ml*.swp
