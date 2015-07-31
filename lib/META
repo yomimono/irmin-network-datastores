@@ -1,0 +1,12 @@
+# OASIS_START
+# DO NOT EDIT (digest: 013c8e8c439c520ab147743e5f914d5c)
+version = "0.0.1"
+description = "useful data structures for network stores using Irmin."
+requires = "irmin lwt ipaddr ezjsonm mirage-types"
+archive(byte) = "irmin-network-datastores.cma"
+archive(byte, plugin) = "irmin-network-datastores.cma"
+archive(native) = "irmin-network-datastores.cmxa"
+archive(native, plugin) = "irmin-network-datastores.cmxs"
+exists_if = "irmin-network-datastores.cma"
+# OASIS_STOP
+
