@@ -1,3 +1,3 @@
-module Make(Entry : S.ENTRY_ELIGIBLE) : sig
-  include S.ENTRY with type entry = Entry.t
+module Make(Entry : Inds_types.ENTRY_ELIGIBLE) : sig
+  include Inds_types.ENTRY with type entry = Entry.t
 end

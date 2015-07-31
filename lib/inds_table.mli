@@ -1,4 +1,4 @@
-module Make (Key: S.KEY) (Entry: S.ENTRY) (P: Irmin.Path.S) : sig
+module Make (Key: Inds_types.KEY) (Entry: Inds_types.ENTRY) (P: Irmin.Path.S) : sig
   module M : Map.S with type key = Key.t
   module Ops : sig
     include Tc.S0 with type t = Entry.t M.t (* map from ip -> entry *)

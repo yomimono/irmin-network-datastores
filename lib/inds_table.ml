@@ -1,4 +1,4 @@
-module Make (Key: S.KEY) (Entry: S.ENTRY) (P: Irmin.Path.S) = struct 
+module Make (Key: Inds_types.KEY) (Entry: Inds_types.ENTRY) (P: Irmin.Path.S) = struct 
   module Path = P
   module Ops = struct
     module M = Map.Make(Key)

@@ -6,11 +6,12 @@ Authors:     Mindy Preston
 License:     ISC
 Plugins:     META (0.4), DevFiles (0.4)
 BuildTools:  ocamlbuild
+AlphaFeatures: pure_interface
 
 Library "irmin-network-datastores"
   Path:            lib/
   Findlibname:     irmin-network-datastores
-  Modules:         Inds_table, Inds_entry, Inds_key
+  Modules:         Inds_table, Inds_entry, Inds_key, Inds_types, Inds_wrappers
   BuildDepends:    irmin, lwt, ipaddr, ezjsonm, mirage-types
 
 Executable test_ops

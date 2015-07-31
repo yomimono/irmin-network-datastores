@@ -1,13 +1,4 @@
-module M : sig
-  include S.ENTRY_ELIGIBLE with type t = Macaddr.t
-end = struct
-  type t = Macaddr.t
-  let compare = Macaddr.compare
-  let to_string = Macaddr.to_string ~sep:':' (* a lot of work for a sep:':'! *)
-  let of_string = Macaddr.of_string
-end
-
-module Entry = Inds_entry.Make(M)
+module Entry = Inds_entry.Make(Inds_wrappers.Macaddr_entry)
 module Key = Inds_key.Make(Ipaddr.V4)
 module T = Inds_table.Make(Key)(Entry)(Irmin.Path.String_list)
 module Ipv4_map = T.M

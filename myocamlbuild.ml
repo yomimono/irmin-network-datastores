@@ -1,5 +1,5 @@
 (* OASIS_START *)
-(* DO NOT EDIT (digest: 3e0c06d42bb26f5dfb5d5d0a45cd6faf) *)
+(* DO NOT EDIT (digest: efb5363ccfb0edd08cee06e04600b04d) *)
 module OASISGettext = struct
 (* # 22 "src/oasis/OASISGettext.ml" *)
 
@@ -607,7 +607,8 @@ end
 open Ocamlbuild_plugin;;
 let package_default =
   {
-     MyOCamlbuildBase.lib_ocaml = [("irmin-network-datastores", ["lib"], [])];
+     MyOCamlbuildBase.lib_ocaml =
+       [("irmin-network-datastores", ["lib"], ["Inds_types"])];
      lib_c = [];
      flags = [];
      includes = [("lib_test", ["lib"])]
@@ -618,6 +619,6 @@ let conf = {MyOCamlbuildFindlib.no_automatic_syntax = false}
 
 let dispatch_default = MyOCamlbuildBase.dispatch_default conf package_default;;
 
-# 622 "myocamlbuild.ml"
+# 623 "myocamlbuild.ml"
 (* OASIS_STOP *)
 Ocamlbuild_plugin.dispatch dispatch_default;;

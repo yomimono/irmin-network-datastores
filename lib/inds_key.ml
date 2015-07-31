@@ -1,5 +1,5 @@
 (* provide Tc.S0 stuff for Key *)
-module Make(Key : S.KEY_ELIGIBLE) = struct
+module Make(Key : Inds_types.KEY_ELIGIBLE) = struct
   type t = Key.t
 
   let compare = Key.compare

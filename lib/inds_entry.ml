@@ -1,4 +1,4 @@
-module Make(Entry: S.ENTRY_ELIGIBLE) = struct
+module Make(Entry: Inds_types.ENTRY_ELIGIBLE) = struct
 
   type result = [ `Ok of Entry.t | `Timeout ]
   type entry = Entry.t
