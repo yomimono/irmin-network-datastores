@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 883aea06f3e6de2cab2f06278adbc6b6)
+# DO NOT EDIT (digest: 2cfed3945ead24218b8f133eb8defd75)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -23,25 +23,33 @@ true: annot, bin_annot
 <lib/*.ml{,i,y}>: pkg_mirage-types
 # Executable test_ops
 <lib_test/test_ops.{native,byte}>: pkg_alcotest
+<lib_test/test_ops.{native,byte}>: pkg_ezjsonm
 <lib_test/test_ops.{native,byte}>: pkg_ipaddr
 <lib_test/test_ops.{native,byte}>: pkg_irmin
-<lib_test/test_ops.{native,byte}>: pkg_irmin-arp
 <lib_test/test_ops.{native,byte}>: pkg_irmin.unix
 <lib_test/test_ops.{native,byte}>: pkg_lwt
+<lib_test/test_ops.{native,byte}>: pkg_mirage-types
 <lib_test/test_ops.{native,byte}>: pkg_oUnit
+<lib_test/test_ops.{native,byte}>: use_irmin-network-datastores
+<lib_test/test_ops.{native,byte}>: custom
 # Executable test_table
 <lib_test/test_table.{native,byte}>: pkg_alcotest
+<lib_test/test_table.{native,byte}>: pkg_ezjsonm
 <lib_test/test_table.{native,byte}>: pkg_ipaddr
 <lib_test/test_table.{native,byte}>: pkg_irmin
-<lib_test/test_table.{native,byte}>: pkg_irmin-arp
 <lib_test/test_table.{native,byte}>: pkg_irmin.unix
 <lib_test/test_table.{native,byte}>: pkg_lwt
+<lib_test/test_table.{native,byte}>: pkg_mirage-types
 <lib_test/test_table.{native,byte}>: pkg_oUnit
+<lib_test/test_table.{native,byte}>: use_irmin-network-datastores
 <lib_test/*.ml{,i,y}>: pkg_alcotest
+<lib_test/*.ml{,i,y}>: pkg_ezjsonm
 <lib_test/*.ml{,i,y}>: pkg_ipaddr
 <lib_test/*.ml{,i,y}>: pkg_irmin
-<lib_test/*.ml{,i,y}>: pkg_irmin-arp
 <lib_test/*.ml{,i,y}>: pkg_irmin.unix
 <lib_test/*.ml{,i,y}>: pkg_lwt
+<lib_test/*.ml{,i,y}>: pkg_mirage-types
 <lib_test/*.ml{,i,y}>: pkg_oUnit
+<lib_test/*.ml{,i,y}>: use_irmin-network-datastores
+<lib_test/test_table.{native,byte}>: custom
 # OASIS_STOP

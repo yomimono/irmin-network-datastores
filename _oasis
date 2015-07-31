@@ -9,7 +9,7 @@ BuildTools:  ocamlbuild
 
 Library "irmin-network-datastores"
   Path:            lib/
-  Findlibname:     irmin-net-ds
+  Findlibname:     irmin-network-datastores
   Modules:         Table, Entry, Key
   BuildDepends:    irmin, lwt, ipaddr, ezjsonm, mirage-types
 
@@ -17,17 +17,19 @@ Executable test_ops
   Build$:         flag(tests)
   Path:           lib_test
   MainIs:         test_ops.ml
+  Custom:         true
   CompiledObject: best
   Install:        false
-  BuildDepends:   irmin, irmin-arp, lwt, irmin.unix, ipaddr, alcotest, oUnit
+  BuildDepends:   irmin, lwt, irmin.unix, ipaddr, alcotest, oUnit, irmin-network-datastores
 
 Executable test_table
   Build$:         flag(tests)
   Path:           lib_test
   MainIs:         test_table.ml
+  Custom:         true
   CompiledObject: best
   Install:        false
-  BuildDepends:   irmin, irmin-arp, lwt, irmin.unix, ipaddr, alcotest, oUnit
+  BuildDepends:   irmin, lwt, irmin.unix, ipaddr, alcotest, oUnit, irmin-network-datastores  
 
 Test test_ops
   Run$: flag(tests)
