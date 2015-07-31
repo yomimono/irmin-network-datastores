@@ -1,4 +1,11 @@
-module T = Ipv4_macaddr_table.Make(Irmin.Path.String_list)
+module M : Expiring_entry.C_S = struct
+  type t = Macaddr.t
+  let compare = Macaddr.compare
+  let to_string = Macaddr.to_string ~sep:':'
+  let of_string = Macaddr.of_string
+end
+
+module T = Ipv4_entry_table.Make(Macaddr_entry.Make(M))(Irmin.Path.String_list)
 module Ipv4_map = T.M
 
 let parse ip mac time = (Ipaddr.V4.of_string_exn ip, Macaddr.of_string_exn
