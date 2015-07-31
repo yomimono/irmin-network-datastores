@@ -2,6 +2,7 @@ module Make(P: Irmin.Path.S) = struct
   module Path = P
   module Ops = struct
     module M = Map.Make(Ipaddr.V4)
+    module Entry = Macaddr_entry
     type t = Entry.t M.t (* map from ip -> entry *)
 
     let hash = Hashtbl.hash

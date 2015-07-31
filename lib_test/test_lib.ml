@@ -1,9 +1,9 @@
-module T = Table.Make(Irmin.Path.String_list)
+module T = Ipv4_macaddr_table.Make(Irmin.Path.String_list)
 module Ipv4_map = T.M
 
 let parse ip mac time = (Ipaddr.V4.of_string_exn ip, Macaddr.of_string_exn
                            mac, time)
-let confirm time mac = Entry.make_confirmed time mac
+let confirm time mac = Macaddr_entry.make_confirmed time mac
 
 let ip1_str, mac1_str = "192.168.3.11", "10:9a:dd:00:00:11"
 let ip2_str, mac2_str = "192.168.3.22", "00:16:3e:00:00:22"
@@ -23,7 +23,7 @@ let assert_in m k =
     ~printer:string_of_bool true (Ipv4_map.mem k m)
 let assert_resolves m k v =
   assert_in m k;
-  OUnit.assert_equal ~printer:Entry.to_string v (Ipv4_map.find k m)
+  OUnit.assert_equal ~printer:Macaddr_entry.to_string v (Ipv4_map.find k m)
 let assert_absent m k =
   OUnit.assert_equal ~msg:"asserting absence of key fails" 
     ~printer:string_of_bool false (Ipv4_map.mem k m)
