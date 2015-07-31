@@ -1,4 +1,4 @@
-module type C_S = sig
+module type ENTRY_ELIGIBLE = sig
   type t
   val compare : t -> t -> int
   val to_string : t -> string

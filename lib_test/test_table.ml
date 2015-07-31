@@ -1,8 +1,6 @@
 open Lwt
 open Test_lib
 
-module Entry = Macaddr_entry
-
 let root = "test_results/table_tests"
 
 let make_in_memory () =

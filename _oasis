@@ -10,7 +10,7 @@ BuildTools:  ocamlbuild
 Library "irmin-network-datastores"
   Path:            lib/
   Findlibname:     irmin-network-datastores
-  Modules:         Ipv4_macaddr_table, Macaddr_entry, Ipv4_key
+  Modules:         Ipv4_entry_table, Macaddr_entry, Ipv4_key
   BuildDepends:    irmin, lwt, ipaddr, ezjsonm, mirage-types
 
 Executable test_ops
