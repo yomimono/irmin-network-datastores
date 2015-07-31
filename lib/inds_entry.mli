@@ -1,3 +1,3 @@
-module Make(Entry : Expiring_entry.ENTRY_ELIGIBLE) : sig
-  include Expiring_entry.ENTRY with type entry = Entry.t
+module Make(Entry : S.ENTRY_ELIGIBLE) : sig
+  include S.ENTRY with type entry = Entry.t
 end

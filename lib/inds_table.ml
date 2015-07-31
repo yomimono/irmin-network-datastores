@@ -1,8 +1,8 @@
-module Make (Entry: Expiring_entry.ENTRY) (P: Irmin.Path.S) = struct 
+module Make (Key: S.KEY) (Entry: S.ENTRY) (P: Irmin.Path.S) = struct 
   module Path = P
   module Ops = struct
-    module M = Map.Make(Ipaddr.V4)
-    type t = Entry.t M.t (* map from ip -> entry *)
+    module M = Map.Make(Key)
+    type t = Entry.t M.t
 
     let hash = Hashtbl.hash
     let compare = M.compare (Entry.compare)
@@ -14,8 +14,8 @@ module Make (Entry: Expiring_entry.ENTRY) (P: Irmin.Path.S) = struct
           (fun (name, entry) -> (name, Entry.of_json entry)) top_dict
       in
       let mapify map (name, entry) = 
-        match (Ipaddr.V4.of_string name), entry with 
-        | Some addr, Some entry -> M.add addr entry map
+        match (Key.of_string name), entry with 
+        | Some key, Some entry -> M.add key entry map
         | _, _ -> map
       in
       List.fold_left mapify M.empty entries
@@ -23,11 +23,11 @@ module Make (Entry: Expiring_entry.ENTRY) (P: Irmin.Path.S) = struct
     let to_json map = 
       let add_binding key value json =
         try
-          Ezjsonm.update json [(Ipaddr.V4.to_string key)] (Some (Entry.to_json value) )
+          Ezjsonm.update json [(Key.to_string key)] (Some (Entry.to_json value) )
         with
-        | Not_found -> raise (Invalid_argument (Printf.sprintf 
-                                                  "Couldn't make json out of key %s and entry %s" 
-                                                  (Ipaddr.V4.to_string key) (Entry.to_string value)))
+        | Not_found ->
+          raise (Invalid_argument (Printf.sprintf "Couldn't make json out of key %s and entry %s" 
+                                     (Key.to_string key) (Entry.to_string value)))
       in
       M.fold add_binding map (Ezjsonm.dict [])
 

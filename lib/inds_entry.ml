@@ -1,9 +1,11 @@
-module Make(Entry: Expiring_entry.C_S) = struct
+module Make(Entry: S.ENTRY_ELIGIBLE) = struct
 
   type result = [ `Ok of Entry.t | `Timeout ]
   type entry = Entry.t
   type t = 
     | Confirmed of float * Entry.t
+
+  let make_confirmed time mac = Confirmed (time, mac)
 
   let to_string = function
     | Confirmed (time, mac) -> Printf.sprintf "%s expiring at %f"

@@ -1,14 +1,15 @@
 module M : sig
-  include Expiring_entry.ENTRY_ELIGIBLE with type t = Macaddr.t
+  include S.ENTRY_ELIGIBLE with type t = Macaddr.t
 end = struct
   type t = Macaddr.t
   let compare = Macaddr.compare
-  let to_string = Macaddr.to_string ~sep:':'
+  let to_string = Macaddr.to_string ~sep:':' (* a lot of work for a sep:':'! *)
   let of_string = Macaddr.of_string
 end
 
-module Entry = Macaddr_entry.Make(M)
-module T = Ipv4_entry_table.Make(Entry)(Irmin.Path.String_list)
+module Entry = Inds_entry.Make(M)
+module Key = Inds_key.Make(Ipaddr.V4)
+module T = Inds_table.Make(Key)(Entry)(Irmin.Path.String_list)
 module Ipv4_map = T.M
 
 let parse ip mac time = (Ipaddr.V4.of_string_exn ip, Macaddr.of_string_exn
