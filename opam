@@ -16,7 +16,7 @@ depends: [
    "ocamlfind" {build}
    "alcotest" {test}
    "oUnit" {test}
-   "irmin.git" {test}
+   "git" {test}
    "irmin-unix" {test}
    "irmin" {>= "0.9.8"}
    ]
