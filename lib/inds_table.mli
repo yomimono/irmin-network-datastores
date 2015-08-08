@@ -10,5 +10,5 @@ module Make (Key: Inds_types.KEY) (Entry: Inds_types.ENTRY) (P: Irmin.Path.S) : 
   val remove : Key.t -> t -> t
   val find : Key.t -> t -> Entry.t
   val empty : t
-  val expire : t -> float -> t
+  val expire : t -> int -> t
 end

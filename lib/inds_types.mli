@@ -11,13 +11,13 @@ end
 
 module type ENTRY = sig
   type entry
-  type t = | Confirmed of float * entry
+  type t = | Confirmed of int * entry
   type result = [ `Ok of entry | `Timeout ]
   val of_json : Ezjsonm.value -> t option
   val to_json : t -> Ezjsonm.value
   val compare : t -> t -> int
   val to_string : t -> string
-  val make_confirmed : float -> entry -> t
+  val make_confirmed : int -> entry -> t
 end
 
 module type KEY_ELIGIBLE = sig

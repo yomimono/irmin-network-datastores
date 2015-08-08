@@ -23,7 +23,7 @@ let write_single_complete_entry () =
   OUnit.assert_equal ~printer:string_of_bool true (Ezjsonm.mem ip1_node ["expiry"]);
   OUnit.assert_equal ~printer:string_of_bool true (Ezjsonm.mem ip1_node ["mac"]);
   (* and their entries are correct *)
-  OUnit.assert_equal ~printer:string_of_float time1 (Ezjsonm.get_float (Ezjsonm.find ip1_node ["expiry"]));
+  OUnit.assert_equal ~printer:string_of_int time1 (Ezjsonm.get_int (Ezjsonm.find ip1_node ["expiry"]));
   OUnit.assert_equal mac1_str (Ezjsonm.get_string (Ezjsonm.find ip1_node
                                                      ["mac"]));
   (* { "192.168.3.50":{ "expiry":0.0, "mac":"00:11:22:33:44:55" } } *)
@@ -40,7 +40,7 @@ let write_populated_map () =
 
 let valify mac time = 
   Ezjsonm.dict [ ("mac", (Ezjsonm.string mac));
-                 ("expiry", (Ezjsonm.float time)) ]
+                 ("expiry", (Ezjsonm.int time)) ]
 
 let formulate_json name mac time =
   Ezjsonm.dict [ (name, valify mac time) ]
@@ -95,7 +95,7 @@ let larger () =
 let entry_values () =
   let p = sample_table () in
   (* p will have time == 1.5 *)
-  let q = Ipv4_map.add ip2 (confirm 2.0 mac2) p in
+  let q = Ipv4_map.add ip2 (confirm 2 mac2) p in
   OUnit.assert_equal ~printer:string_of_int (-1) (T.Ops.compare p q)
 
 let equal_things_equal_size () = 

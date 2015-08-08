@@ -3,17 +3,17 @@ module Make(Entry: Inds_types.ENTRY_ELIGIBLE) = struct
   type result = [ `Ok of Entry.t | `Timeout ]
   type entry = Entry.t
   type t = 
-    | Confirmed of float * Entry.t
+    | Confirmed of int * Entry.t
 
   let make_confirmed time mac = Confirmed (time, mac)
 
   let to_string = function
-    | Confirmed (time, mac) -> Printf.sprintf "%s expiring at %f"
+    | Confirmed (time, mac) -> Printf.sprintf "%s expiring at %d"
                                  (Entry.to_string mac) time
 
   let to_json = function
     | Confirmed (time, mac) -> 
-      let expiry = Ezjsonm.float time in
+      let expiry = Ezjsonm.int time in
       let mac = Ezjsonm.string (Entry.to_string mac) in
       Ezjsonm.dict [("expiry", expiry); ("mac", mac)]
 
@@ -24,7 +24,7 @@ module Make(Entry: Inds_types.ENTRY_ELIGIBLE) = struct
           match (Entry.of_string (get_string (find (dict items) ["mac"]))) with
           | None -> None
           | Some address -> (
-            let expiry = get_float (find (dict items) ["expiry"]) in
+            let expiry = get_int (find (dict items) ["expiry"]) in
             Some (Confirmed (expiry, address)) )
 
   let compare p q =

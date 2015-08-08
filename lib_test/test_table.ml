@@ -48,9 +48,9 @@ let readback_works make_fn () =
 let expire () = 
   let ip = Ipaddr.V4.of_string_exn "10.0.0.1" in
   let mac = Macaddr.of_string_exn "00:16:3e:c0:ff:33" in
-  let map = T.add ip (Entry.Confirmed (0.0, mac)) T.empty in
-  OUnit.assert_equal (Entry.Confirmed (0.0, mac)) (T.find ip map);
-  let expired_map = T.expire map 1337.3030 in
+  let map = T.add ip (Entry.Confirmed (0, mac)) T.empty in
+  OUnit.assert_equal (Entry.Confirmed (0, mac)) (T.find ip map);
+  let expired_map = T.expire map 1337 in
   OUnit.assert_raises Not_found (fun () -> T.find ip expired_map);
   OUnit.assert_equal T.empty expired_map;
   Lwt.return_unit
@@ -212,14 +212,14 @@ let merge_competing_branches make_fn () =
     "competing" >>= fun t1 ->
   let ip = Ipaddr.V4.of_string_exn "10.0.0.1" in
   let mac = Macaddr.of_string_exn "00:16:3e:11:11:11" in
-  let t1_map = T.add ip (Entry.Confirmed (0.5, mac)) T.empty in
+  let t1_map = T.add ip (Entry.Confirmed (0, mac)) T.empty in
   Irmin.update (t1 "merge_competing: first branch") node t1_map >>=
   fun () ->
   clone_nicely Irmin_unix.task (t "merge_competing: second branch")
     "competing" >>= fun t2 ->
   let ip = Ipaddr.V4.of_string_exn "10.0.0.1" in
   let mac = Macaddr.of_string_exn "00:16:3e:22:22:22" in
-  let t2_map = T.add ip (Entry.Confirmed (1.0, mac)) T.empty in
+  let t2_map = T.add ip (Entry.Confirmed (1, mac)) T.empty in
   Irmin.update (t2 "merge_competing: second branch") node t2_map >>=
   fun () ->
   (* now try merging t1 into primary *)
