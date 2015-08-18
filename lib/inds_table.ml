@@ -58,6 +58,7 @@ module Make (Key: Inds_types.KEY) (Entry: Inds_types.ENTRY) (P: Irmin.Path.S) = 
   let remove = M.remove
   let find = M.find
   let empty = M.empty
+  let mem = M.mem
   let expire t now =
     M.filter (fun _ip entry -> match entry with
         | Entry.Confirmed (time, _) -> time > now) t

@@ -9,6 +9,7 @@ module Make (Key: Inds_types.KEY) (Entry: Inds_types.ENTRY) (P: Irmin.Path.S) : 
   val add : Key.t -> Entry.t -> t -> t
   val remove : Key.t -> t -> t
   val find : Key.t -> t -> Entry.t
+  val mem : Key.t -> t -> bool
   val empty : t
   val expire : t -> int -> t
 end
