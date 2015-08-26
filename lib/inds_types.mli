@@ -28,4 +28,9 @@ end
 module type KEY = sig
   include Map.OrderedType
   include KEY_ELIGIBLE with type t := t
+  val to_json : t -> Ezjsonm.value
+  val of_json : Ezjsonm.value -> t
+  val read : t Tc.reader
+  val write : t Tc.writer
+  val size_of : t -> int
 end

@@ -1,5 +1,5 @@
 module Entry = Inds_entry.Make(Inds_wrappers.Macaddr_entry)
-module Key = Inds_key.Make(Ipaddr.V4)
+module Key = Inds_key.Make(Inds_wrappers.Ipv4addr_key)
 module T = Inds_table.Make(Key)(Entry)(Irmin.Path.String_list)
 module Ipv4_map = T.M
 

@@ -1,10 +1,6 @@
 (* provide Tc.S0 stuff for Key *)
 module Make(Key : Inds_types.KEY_ELIGIBLE) = struct
-  type t = Key.t
-
-  let compare = Key.compare
-  let of_string = Key.of_string
-  let to_string = Key.to_string
+  include Key
 
   let read buf =
     let raw = Mstruct.to_string buf in
