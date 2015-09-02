@@ -15,7 +15,7 @@ module Make (Key: Inds_types.KEY) (Entry: Inds_types.ENTRY) (P: Irmin.Path.S) = 
       in
       let mapify map (name, entry) = 
         match (Key.of_string name), entry with 
-        | Some key, Some entry -> M.add key entry map
+        | Some key, entry -> M.add key entry map
         | _, _ -> map
       in
       List.fold_left mapify M.empty entries
@@ -26,8 +26,7 @@ module Make (Key: Inds_types.KEY) (Entry: Inds_types.ENTRY) (P: Irmin.Path.S) = 
           Ezjsonm.update json [(Key.to_string key)] (Some (Entry.to_json value) )
         with
         | Not_found ->
-          raise (Invalid_argument (Printf.sprintf "Couldn't make json out of key %s and entry %s" 
-                                     (Key.to_string key) (Entry.to_string value)))
+          raise (Invalid_argument "failure constructing JSON")
       in
       M.fold add_binding map (Ezjsonm.dict [])
 

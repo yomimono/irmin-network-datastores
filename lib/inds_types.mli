@@ -13,10 +13,9 @@ module type ENTRY = sig
   type entry
   type t = | Confirmed of int * entry
   type result = [ `Ok of entry | `Timeout ]
-  val of_json : Ezjsonm.value -> t option
+  val of_json : Ezjsonm.value -> t
   val to_json : t -> Ezjsonm.value
   val compare : t -> t -> int
-  val to_string : t -> string
   val make_confirmed : int -> entry -> t
 end
 
@@ -28,4 +27,6 @@ end
 module type KEY = sig
   include Map.OrderedType
   include KEY_ELIGIBLE with type t := t
+  val to_json : t -> Ezjsonm.value
+  val of_json : Ezjsonm.value -> t
 end

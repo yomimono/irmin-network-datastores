@@ -1,5 +1,5 @@
 module Entry = Inds_entry.Make(Inds_wrappers.Macaddr_entry)
-module Key = Inds_key.Make(Ipaddr.V4)
+module Key = Inds_key.Make(Inds_wrappers.Ipv4addr_key)
 module T = Inds_table.Make(Key)(Entry)(Irmin.Path.String_list)
 module Ipv4_map = T.M
 
@@ -25,7 +25,7 @@ let assert_in m k =
     ~printer:string_of_bool true (Ipv4_map.mem k m)
 let assert_resolves m k v =
   assert_in m k;
-  OUnit.assert_equal ~printer:Entry.to_string v (Ipv4_map.find k m)
+  OUnit.assert_equal v (Ipv4_map.find k m)
 let assert_absent m k =
   OUnit.assert_equal ~msg:"asserting absence of key fails" 
     ~printer:string_of_bool false (Ipv4_map.mem k m)
