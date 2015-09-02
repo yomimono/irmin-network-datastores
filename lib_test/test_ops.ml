@@ -6,12 +6,12 @@ let write_empty_json () =
   OUnit.assert_equal ~printer:(fun p -> Ezjsonm.to_string (Ezjsonm.wrap p)) 
     (Ezjsonm.dict []) (T.to_json map)
 
-let write_single_complete_entry () =
+let write_singleton_map () =
   let map = Ipv4_map.empty in
   (* one entry -> dictionary json entry *)
   let populated_map = Ipv4_map.add ip1 (confirm time1 mac1) map in
   let populated_json = T.Ops.to_json populated_map in
-  Printf.printf "%s\n" (Ezjsonm.to_string (Ezjsonm.wrap populated_json));
+  Printf.printf "result of to_json: %s\n" (Ezjsonm.to_string (Ezjsonm.wrap populated_json));
   let dict = Ezjsonm.get_dict populated_json in
   (* there's one (and only one) entry *)
   OUnit.assert_equal ~printer:string_of_int 1 (List.length dict); 
@@ -21,12 +21,11 @@ let write_single_complete_entry () =
   let ip1_node = Ezjsonm.find populated_json [ip1_str] in
   (* both expiry and mac are present *)
   OUnit.assert_equal ~printer:string_of_bool true (Ezjsonm.mem ip1_node ["expiry"]);
-  OUnit.assert_equal ~printer:string_of_bool true (Ezjsonm.mem ip1_node ["mac"]);
+  OUnit.assert_equal ~printer:string_of_bool true (Ezjsonm.mem ip1_node ["entry"]);
   (* and their entries are correct *)
   OUnit.assert_equal ~printer:string_of_int time1 (Ezjsonm.get_int (Ezjsonm.find ip1_node ["expiry"]));
   OUnit.assert_equal mac1_str (Ezjsonm.get_string (Ezjsonm.find ip1_node
-                                                     ["mac"]));
-  (* { "192.168.3.50":{ "expiry":0.0, "mac":"00:11:22:33:44:55" } } *)
+                                                     ["entry"]));
   ()
 
 let write_populated_map () = 
@@ -39,7 +38,7 @@ let write_populated_map () =
   OUnit.assert_equal true (Ezjsonm.mem json [ip2_str])
 
 let valify mac time = 
-  Ezjsonm.dict [ ("mac", (Ezjsonm.string mac));
+  Ezjsonm.dict [ ("entry", (Ezjsonm.string mac));
                  ("expiry", (Ezjsonm.int time)) ]
 
 let formulate_json name mac time =
@@ -123,7 +122,7 @@ let () =
   ] in
   let json = [ 
     "write_empty_map", `Slow, write_empty_json;
-    "write_singleton_map", `Slow, write_single_complete_entry;
+    "write_singleton_map", `Slow, write_singleton_map;
     "write_populated_map", `Slow, write_populated_map;
     "read_empty_map", `Slow, read_empty_json;
     "read_singleton_map", `Slow, read_singleton_map;

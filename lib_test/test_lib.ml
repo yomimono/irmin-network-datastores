@@ -25,7 +25,7 @@ let assert_in m k =
     ~printer:string_of_bool true (Ipv4_map.mem k m)
 let assert_resolves m k v =
   assert_in m k;
-  OUnit.assert_equal ~printer:Entry.to_string v (Ipv4_map.find k m)
+  OUnit.assert_equal v (Ipv4_map.find k m)
 let assert_absent m k =
   OUnit.assert_equal ~msg:"asserting absence of key fails" 
     ~printer:string_of_bool false (Ipv4_map.mem k m)
