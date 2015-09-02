@@ -1,6 +1,6 @@
 OASISFormat: 0.4
 Name:        irmin-network-datastores
-Version:     0.0.1
+Version:     0.0.2
 Synopsis:    useful data structures for network stores using Irmin.
 Authors:     Mindy Preston
 License:     ISC
