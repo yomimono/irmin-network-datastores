@@ -21,21 +21,8 @@ Executable test_ops
   Custom:         true
   CompiledObject: best
   Install:        false
-  BuildDepends:   irmin, lwt, irmin.unix, ipaddr, alcotest, oUnit, irmin-network-datastores
-
-Executable test_table
-  Build$:         flag(tests)
-  Path:           lib_test
-  MainIs:         test_table.ml
-  Custom:         true
-  CompiledObject: best
-  Install:        false
-  BuildDepends:   irmin, lwt, irmin.unix, ipaddr, alcotest, oUnit, irmin-network-datastores  
+  BuildDepends:   irmin, lwt, irmin.unix, ipaddr, alcotest, oUnit, irmin-network-datastores, quickcheck, arbitrary-network
 
 Test test_ops
   Run$: flag(tests)
   Command: $test_ops
-
-Test test_table
-  Run$: flag(tests)
-  Command: $test_table

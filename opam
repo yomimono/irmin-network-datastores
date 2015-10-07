@@ -18,5 +18,7 @@ depends: [
    "oUnit" {test}
    "git" {test}
    "irmin-unix" {test}
-   "irmin" {>= "0.9.8"}
+   "quickcheck" {test}
+   "arbitrary-network" {test} {> "0.0.1"}
+   "irmin" {>= "0.9.10"}
    ]
