@@ -15,6 +15,9 @@ module type ENTRY = sig
   type result = [ `Ok of entry | `Timeout ]
   val of_json : Ezjsonm.value -> t
   val to_json : t -> Ezjsonm.value
+  val read : t Tc.reader
+  val write : t Tc.writer
+  val size_of : t -> int
   val compare : t -> t -> int
   val make_confirmed : int -> entry -> t
 end
