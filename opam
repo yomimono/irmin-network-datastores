@@ -1,6 +1,6 @@
 opam-version: "1.2"
 name: "irmin-network-datastores"
-version: "0.0.2"
+version: "0.1"
 maintainer: "Mindy Preston <meetup@yomimono.org>"
 authors: "Mindy Preston <meetup@yomimono.org>"
 homepage: "https://github.com/yomimono/irmin-network-datastores"
@@ -14,11 +14,14 @@ install: [make "install"]
 remove: ["ocamlfind" "remove" "irmin-network-datastores"]
 depends: [
    "ocamlfind" {build}
+   "tc"
    "alcotest" {test}
    "oUnit" {test}
    "git" {test}
    "irmin-unix" {test}
    "quickcheck" {test}
-   "arbitrary-network" {test} {> "0.0.1"}
-   "irmin" {>= "0.9.10"}
+   "arbitrary-network" {test} {>= "0.0.2"}
    ]
+conflicts: [
+   "irmin" {< "0.9.10"}
+]

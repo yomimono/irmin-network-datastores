@@ -1,6 +1,6 @@
 OASISFormat: 0.4
 Name:        irmin-network-datastores
-Version:     0.0.2
+Version:     0.1
 Synopsis:    useful data structures for network stores using Irmin.
 Authors:     Mindy Preston
 License:     ISC
@@ -11,8 +11,8 @@ AlphaFeatures: pure_interface
 Library "irmin-network-datastores"
   Path:            lib/
   Findlibname:     irmin-network-datastores
-  Modules:         Inds_table, Inds_entry, Inds_key, Inds_types, Inds_wrappers
-  BuildDepends:    irmin, lwt, ipaddr, ezjsonm, mirage-types
+  Modules:         Inds_entry, Inds_key, Inds_types, Inds_wrappers
+  BuildDepends:    lwt, ipaddr, ezjsonm, mirage-types, tc
 
 Executable test_ops
   Build$:         flag(tests)
@@ -21,7 +21,7 @@ Executable test_ops
   Custom:         true
   CompiledObject: best
   Install:        false
-  BuildDepends:   irmin, lwt, irmin.unix, ipaddr, alcotest, oUnit, irmin-network-datastores, quickcheck, arbitrary-network
+  BuildDepends:   lwt, irmin.unix, ipaddr, alcotest, oUnit, irmin-network-datastores, quickcheck, arbitrary-network
 
 Test test_ops
   Run$: flag(tests)
