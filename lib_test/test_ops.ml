@@ -1,144 +1,97 @@
 open Test_lib
+module Macaddr_entry = Inds_entry.Make(Inds_wrappers.Macaddr_entry)
 
-let write_empty_json () =
-  (* empty map -> unit json *)
-  let map = T.empty in
-  OUnit.assert_equal ~printer:(fun p -> Ezjsonm.to_string (Ezjsonm.wrap p)) 
-    (Ezjsonm.dict []) (T.to_json map)
+let arbitrary_mac_entry =
+  let open QuickCheck_gen in
+  Arbitrary.arbitrary_mac >>= fun mac ->
+  QuickCheck.arbitrary_int >>= fun time ->
+  ret_gen (Macaddr_entry.make_confirmed time mac)
 
-let write_singleton_map () =
-  let map = Ipv4_map.empty in
-  (* one entry -> dictionary json entry *)
-  let populated_map = Ipv4_map.add ip1 (confirm time1 mac1) map in
-  let populated_json = T.Ops.to_json populated_map in
-  Printf.printf "result of to_json: %s\n" (Ezjsonm.to_string (Ezjsonm.wrap populated_json));
-  let dict = Ezjsonm.get_dict populated_json in
-  (* there's one (and only one) entry *)
-  OUnit.assert_equal ~printer:string_of_int 1 (List.length dict); 
-  (* its name is ip1 *)
-  OUnit.assert_equal ~printer:string_of_bool 
-    true (Ezjsonm.mem populated_json [ip1_str]); 
-  let ip1_node = Ezjsonm.find populated_json [ip1_str] in
-  (* both expiry and mac are present *)
-  OUnit.assert_equal ~printer:string_of_bool true (Ezjsonm.mem ip1_node ["expiry"]);
-  OUnit.assert_equal ~printer:string_of_bool true (Ezjsonm.mem ip1_node ["entry"]);
-  (* and their entries are correct *)
-  OUnit.assert_equal ~printer:string_of_int time1 (Ezjsonm.get_int (Ezjsonm.find ip1_node ["expiry"]));
-  OUnit.assert_equal mac1_str (Ezjsonm.get_string (Ezjsonm.find ip1_node
-                                                     ["entry"]));
-  ()
+(* verify that store/read of a single key/value pair when no previous mapping
+   existed preserves meaning *)
+(* this is actually a test of read/write for values, which could be a
+   property test *)
+let check_macs =
+  QuickCheck.(quickCheck (testable_fun Arbitrary.arbitrary_mac
+                            (Macaddr.to_string ~sep:':') testable_bool))
 
-let write_populated_map () = 
-  let map = sample_table () in
-  let json = T.Ops.to_json map in
-  let delicious_innards = Ezjsonm.get_dict json in
-  (* should have an entry for each ip *)
-  OUnit.assert_equal ~printer:string_of_int 2 (List.length delicious_innards);
-  OUnit.assert_equal true (Ezjsonm.mem json [ip1_str]);
-  OUnit.assert_equal true (Ezjsonm.mem json [ip2_str])
+let check_addrs =
+  QuickCheck.(quickCheck (testable_fun Arbitrary.arbitrary_ipv4
+                            Ipaddr.V4.to_string testable_bool))
 
-let valify mac time = 
-  Ezjsonm.dict [ ("entry", (Ezjsonm.string mac));
-                 ("expiry", (Ezjsonm.int time)) ]
+let check_entries =
+  let str_of_value v = Ezjsonm.to_string (Ezjsonm.wrap v) in
+  let show entry = str_of_value (Macaddr_entry.to_json entry) in
+  QuickCheck.(quickCheck (testable_fun arbitrary_mac_entry show testable_bool))
 
-let formulate_json name mac time =
-  Ezjsonm.dict [ (name, valify mac time) ]
+let assert_succeeds =
+  OUnit.assert_equal ~printer:Arbitrary.qc_printer QuickCheck.Success
 
+let test_json_ipv4_keys () =
+  let prop_json_lossless ipv4 =
+    let module K = Inds_key.Make(Inds_wrappers.Ipv4addr_key) in
+    (Ipaddr.V4.compare ipv4 (K.of_json (K.to_json ipv4))) = 0
+  in
+  assert_succeeds (check_addrs prop_json_lossless)
 
-let read_empty_json () =
-  let nothin = T.Ops.of_json (Ezjsonm.dict []) in
-  OUnit.assert_equal ~printer:string_of_int 0 (Ipv4_map.cardinal nothin)
+let test_json_mac_keys () =
+  let prop_json_lossless mac =
+    let module K = Inds_key.Make(Inds_wrappers.Macaddr_entry) in
+    (Macaddr.compare mac (K.of_json (K.to_json mac))) = 0
+  in
+  assert_succeeds (check_macs prop_json_lossless)
 
-let read_singleton_map () =
-  let singleton_json = formulate_json ip1_str mac1_str time1 in
-  let singleton_map = Ipv4_map.singleton ip1 (confirm time1 mac1) in
-  OUnit.assert_equal ~printer:string_of_int 1 (Ipv4_map.cardinal (T.Ops.of_json singleton_json));
-  OUnit.assert_equal singleton_map (T.Ops.of_json singleton_json)
+let test_json_mac_entries () =
+  let prop_json_lossless entry =
+    Macaddr_entry.(compare entry (of_json (to_json entry))) = 0
+  in
+  assert_succeeds (check_entries prop_json_lossless)
 
-let read_populated_map () =
-  let j = T.Ops.to_json (sample_table ()) in
-  let new_table = T.Ops.of_json j in
-  assert_in new_table ip1;
-  assert_in new_table ip2;
-  assert_absent new_table ip3; (* Pending entry not preserved *)
-  (* 2, since we don't preserve the Pending entry *)
-  OUnit.assert_equal 2 (Ipv4_map.cardinal new_table);
-  assert_resolves new_table ip1 (confirm time1 mac1);
-  assert_resolves new_table ip2 (confirm time2 mac2)
+let prop_key_rw_lossless (type t) (module K : Inds_types.KEY_ELIGIBLE with type t = t) (t : t) =
+  let module Key = Inds_key.Make(K) in
+  let buf = Cstruct.create (Key.size_of t) in
+  Cstruct.memset buf 0;
+  let _ = Key.write t buf in
+  Key.compare t (Key.read (Mstruct.of_cstruct buf)) = 0
 
-let empty_maps_equal () =
-  OUnit.assert_equal true (T.Ops.equal (Ipv4_map.empty) (Ipv4_map.empty))
+let prop_entry_rw_lossless t =
+  let buf = Cstruct.create (Entry.size_of t) in
+  Cstruct.memset buf 0;
+  let _ = Entry.write t buf in
+  Entry.compare t (Entry.read (Mstruct.of_cstruct buf)) = 0
 
-let empty_populated_unequal () =
-  let p = Ipv4_map.empty in
-  let q = sample_table () in
-  OUnit.assert_equal false (T.Ops.equal p q)
+let test_rw_ipv4_keys () =
+  assert_succeeds (check_addrs (prop_key_rw_lossless (module Inds_wrappers.Ipv4addr_key)))
 
-let differently_populated_unequal () =
-  let p = Ipv4_map.singleton ip1 (confirm time1 mac1) in
-  let q = sample_table () in
-  OUnit.assert_equal false (T.Ops.equal p q)
+let test_rw_mac_keys () =
+  assert_succeeds (check_macs (prop_key_rw_lossless (module Inds_wrappers.Macaddr_entry)))
 
-let smaller () =
-  let p = Ipv4_map.singleton ip1 (confirm time1 mac1) in
-  let q = sample_table () in
-  OUnit.assert_equal (-1) (T.Ops.compare (Ipv4_map.empty) q);
-  OUnit.assert_equal (-1) (T.Ops.compare p q)
+let test_rw_mac_entries () =
+  assert_succeeds (check_entries prop_entry_rw_lossless)
 
-let larger () =
-  let p = Ipv4_map.singleton ip1 (confirm time1 mac1) in
-  let q = sample_table () in
-  OUnit.assert_equal 1 (T.Ops.compare q (Ipv4_map.empty));
-  OUnit.assert_equal 1 (T.Ops.compare q p)
+let test_empty_json_read () =
+  OUnit.assert_raises (Tc.Read_error "semantically unparseable json") (fun () -> Entry.of_json (Ezjsonm.unit ()))
 
-let entry_values () =
-  let p = sample_table () in
-  (* p will have time == 1.5 *)
-  let q = Ipv4_map.add ip2 (confirm 2 mac2) p in
-  OUnit.assert_equal ~printer:string_of_int (-1) (T.Ops.compare p q)
-
-let equal_things_equal_size () = 
-  let p = Ipv4_map.empty in
-  OUnit.assert_equal (T.Ops.size_of p) (T.Ops.size_of Ipv4_map.empty);
-  let p = Ipv4_map.singleton ip1 (confirm time1 mac1) in
-  let q = Ipv4_map.singleton ip1 (confirm time1 mac1) in
-  OUnit.assert_equal (T.Ops.size_of p) (T.Ops.size_of q);
-  let p = sample_table () in
-  let q = sample_table () in
-  OUnit.assert_equal (T.Ops.size_of p) (T.Ops.size_of q)
-
-let larger_things_larger_size () =
-  let p = Ipv4_map.singleton ip1 (confirm time1 mac1) in
-  let q = sample_table () in
-  OUnit.assert_equal true ((T.Ops.size_of p) < (T.Ops.size_of q))
-
+let test_empty_buffer () =
+  OUnit.assert_raises (Tc.Read_error "unparseable entry") (fun () -> Entry.read (Mstruct.create 0))
 
 let () =
-  let read_write_size = [
-    (* don't bother testing read and write, since they're just wrappers around
-       the json functions *)
-    "equal_things_equal_size", `Slow, equal_things_equal_size;
-    "larger_things_larger_size", `Slow, larger_things_larger_size
+  let bad_reads = [
+    "empty_json", `Quick, test_empty_json_read;
+    "empty_buffer", `Quick, test_empty_buffer;
   ] in
   let json = [ 
-    "write_empty_map", `Slow, write_empty_json;
-    "write_singleton_map", `Slow, write_singleton_map;
-    "write_populated_map", `Slow, write_populated_map;
-    "read_empty_map", `Slow, read_empty_json;
-    "read_singleton_map", `Slow, read_singleton_map;
-    "read_populated_map", `Slow, read_populated_map
+    "json_ipv4_keys", `Quick, test_json_ipv4_keys;
+    "json_mac_keys", `Quick, test_json_mac_keys;
+    "json_mac_entries", `Quick, test_json_mac_entries;
   ] in
-  let comp_eq = [
-    "empty_maps_equal", `Slow, empty_maps_equal;
-    "empty_and_populated_unequal", `Slow, empty_populated_unequal;
-    "differently_populated_unequal", `Slow, differently_populated_unequal;
-    "smaller_is_recognized_compare", `Slow, smaller;
-    "larger_is_recognized_compare", `Slow, larger;
-    "different_entry_values_compare", `Slow, entry_values
+  let read_write = [
+    "rw_ipv4_keys", `Quick, test_rw_ipv4_keys;
+    "rw_mac_keys", `Quick, test_rw_mac_keys;
+    "rw_mac_entries", `Quick, test_rw_mac_entries;
   ] in
   Alcotest.run "Irmin_arp.Ops" [
-    "read_write_size", read_write_size;
+    "bad_reads", bad_reads;
     "from_to_json", json;
-    "compare_equal", comp_eq
+    "from_to_buffer", read_write;
   ]
-
